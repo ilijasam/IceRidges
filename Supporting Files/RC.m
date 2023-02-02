@@ -2,14 +2,7 @@
 
 function [X,H] = RC(x,h,h_tres,h_k_min)
 
-
-
-%%      READ THE DATA - Beaufort Gyre
-
-
-
 X = x;
-
 
 %       find all the local maxima and minima
 [h_pot,x_pot] = findpeaks(h,x,'MinPeakHeight',h_k_min);
@@ -17,7 +10,6 @@ X = x;
 h_min = -h_min;
 x_min(h_min<h_tres)=[];
 h_min(h_min<h_tres)=[];
-
 
 %%      FINDING THE CROSSINGS OVER TREASHOLD WHERE RIDGES OCCUR
 
@@ -102,9 +94,6 @@ x_min(x_min>x_pot(end))=[];
 %       ridges can merge or be two separate ridges
 
 
-
-
-
 XMINTEMP = x_min;
 HMINTEMP = h_min;
 x_min = repelem(x_min,2);
@@ -123,7 +112,6 @@ h_start = h_start_stop(1:2:end);
 h_stop = h_start_stop(2:2:end);
 
 
-
 if exist('AA')
 clear AA I
 end
@@ -137,15 +125,10 @@ I(:,2) = AA.*min(h_pot,[0 ; h_pot(1:end-1)])<delta;
 
 I(:,3) = or(I(:,1),I(:,2));
 
-
-
-
 x_start(I(:,3)) = [];
 h_start(I(:,3)) = [];
 x_stop([I(2:end,3) ;false]) = [];
 h_stop([I(2:end,3);false]) = [];
-
-
 
 tekuci = and(I(1:end,3),sign(h_pot - max(h_pot,[0 ; h_pot(1:end-1)])) ) ;
 predhodni = logical( I(:,3) -    tekuci );
@@ -153,13 +136,10 @@ predhodni = logical( I(:,3) -    tekuci );
 h_pot(or(tekuci,[predhodni(2:end);false])) = [];
 x_pot(or(tekuci,[predhodni(2:end);false])) = [];
 
-
-
 iii = iii+1;
 trigger = sum(I(:,3));
 
 disp(['Deleted objects : ' num2str(trigger)])
-
 
 end
 

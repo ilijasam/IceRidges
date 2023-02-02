@@ -1,4 +1,4 @@
-%       this script is reading the raw Beaufort Gyre Upward Looking Sonar data and writing into a .mat file
+%       This script is reading the raw Beaufort Gyre Upward Looking Sonar data and writing into a .mat file
 %       On date 02.02.2023, the data was available here: https://www2.whoi.edu/site/beaufortgyre/data/mooring-data/
 
 clear all
@@ -49,7 +49,7 @@ for year = 2013
         Data.tline = fgets(fid);
         Data.file_name = listing(file+2).name;
         %     save the .mat file of the extracted data to the defined folder
-        save(['D:\Moorings\test\' Data.file_name(1:end-4) '.mat'],'Data' )
+        save(['D:\Moorings\MAT files\' Data.file_name(1:end-4) '.mat'],'Data' )
         %     display the year and the file step
         disp(['File  :  ' num2str(file) ' / ' num2str(no_files) '    |    ' 'Year  :  ' num2str(year)])
    end   
