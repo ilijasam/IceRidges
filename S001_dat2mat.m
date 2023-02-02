@@ -47,14 +47,13 @@ for year = 2013
         frewind(fid);
         Data.tline = fgets(fid);
         Data.file_name = listing(file+2).name;
-        %     save the .mat file of the extracted data to the defined
-        %     folder
+        %     save the .mat file of the extracted data to the defined folder
         save(['D:\Moorings\test\' Data.file_name(1:end-4) '.mat'],'Data' )
         %     display the year and the file step
         disp(['File  :  ' num2str(file) ' / ' num2str(no_files) '    |    ' 'Year  :  ' num2str(year)])
    end
    
- %test comment jos jtrica
+
 end
 
-cd(cf)
+cd(cf) % returining to the coding folder
