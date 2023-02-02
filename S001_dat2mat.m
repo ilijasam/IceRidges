@@ -54,7 +54,7 @@ for year = 2013
         disp(['File  :  ' num2str(file) ' / ' num2str(no_files) '    |    ' 'Year  :  ' num2str(year)])
    end
    
- %test comment
+ %test comment jos jednom
 end
 
 cd(cf)
