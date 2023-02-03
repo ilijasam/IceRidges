@@ -43,11 +43,16 @@ end
 % defining strings abcd for corresponding 1234 locations
 Location_vector = ['a';'b';'c';'d'];
 
-% defining which years to be analysed for 4 different locations
-loc_yrs{1} = [03:08 10:15 16 17];
-loc_yrs{2} = [03 04 06 08 10 12 13 15 16 17];
-loc_yrs{3} = [03 04 05 07];
-loc_yrs{4} = [06 07 08 10 12 13 14 16 17];
+% % defining which years to be analysed for 4 different locations
+% loc_yrs{1} = [03:08 10:15 16 17];
+% loc_yrs{2} = [03 04 06 08 10 12 13 15 16 17];
+% loc_yrs{3} = [03 04 05 07];
+% loc_yrs{4} = [06 07 08 10 12 13 14 16 17];
+
+loc_yrs{1} = [];
+loc_yrs{2} = [];
+loc_yrs{3} = [];
+loc_yrs{4} = [17];
 
 PKS = zeros(5000,100);
 LOCS = zeros(5000,100);

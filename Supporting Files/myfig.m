@@ -1,3 +1,6 @@
+%% This function loads my personal preferences for MATLAB FIGURES
+% Created by: IS, 02.03.2023
+
 function fig = myfig(num,c)
 pause(0.1)
     fig = figure(num);
