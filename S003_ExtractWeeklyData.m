@@ -275,7 +275,7 @@ for mooring_location = 1:4
             myfig(2,1);
             FIG2 = gca;
             if office_screens==1
-                set(gcf,'Position',[2586        1535        1022         199])
+                set(gcf,'Position',[3700        1110        1022         199])
             else
                 set(gcf,'Position',[10 100 700 200])
             end
