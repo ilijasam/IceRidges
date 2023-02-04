@@ -1,16 +1,18 @@
 % This script is goes throug draft datasets, determines the level ice draft by analysing the draft
-% distrivbution and extracts ridge paramenters (deepest, mean, number of ridges).
+% distrivbution and extracts ridge paramenters (deepest, mean, number of ridges). 
+% In order to run this script, data needs to be stored in the folder defined in MatFilesFolder.
 
 addpath('Supporting Files\') % loading supporing scripts&variables
 
 % Defining the folder that contains the draft data in .mat format
 MatFilesFolder = 'c:\Users\ilijas\OneDrive - NTNU\PhD\IceRidges\MAT files';
 
-plotresults = 1;
-office_screens = 1;
-estimate_hourly = 0;
+plotresults = 1;                    % should results be plotted continuously as the script is looping? this makes the script slower if turned on.
+office_screens = 1;                 % if 1, figures are plotted on secondary screen (double screen assumed), if not it is reccomended that positon of figures is adjusted
+estimate_hourly = 1;    
+save_results = 0;                   % should the results be saved?
 
-level_ice_time = 3;                 %   duration of sample for LI estimate (in hours)
+level_ice_time = 1;                 %   duration of sample for LI estimate (in hours)
 level_ice_statistics_days = 7;   	%   duration of sample of estimated LI for LI statistics (in days)
 
 % creating empty plotting variables
@@ -44,20 +46,21 @@ end
 Location_vector = ['a';'b';'c';'d'];
 
 % defining which years to be analysed for 4 different locations A, B, C, D
-loc_yrs{1} = [03:08 10:15 16 17];
-loc_yrs{2} = [03 04 06 08 10 12 13 15 16 17];
-loc_yrs{3} = [03 04 05 07];
-loc_yrs{4} = [06 07 08 10 12 13 14 16 17];
 
+% these are the location/seasons used in Samardžija & Høyland (2023)
+% loc_yrs{1} = [03:08 10:15 16 17];
+% loc_yrs{2} = [03 04 06 08 10 12 13 15 16 17];
+% loc_yrs{3} = [03 04 05 07];
+% loc_yrs{4} = [06 07 08 10 12 13 14 16 17];
+
+% here we turn on only season 2017-2018 for location D
 loc_yrs{1} = [];
 loc_yrs{2} = [];
 loc_yrs{3} = [];
-loc_yrs{4} = [16 17];
+loc_yrs{4} = [17];
 
-% PKS = zeros(5000,100);
-% LOCS = zeros(5000,100);
-
-SetsNum = numel(loc_yrs{1})+numel(loc_yrs{2})+numel(loc_yrs{3})+numel(loc_yrs{4});
+% auxiliarry variable used to estimate script calculation time
+SetsNum = numel(loc_yrs{1})+numel(loc_yrs{2})+numel(loc_yrs{3})+numel(loc_yrs{4}); 
 
 i = 0;
 tic
@@ -89,13 +92,13 @@ for mooring_location = 1:4
         
         h = Data.draft;
         t = Data.dateNUM;
-        dt1 = mean(diff(t));
+
         % there were some errors in time steps for some years, I need it equidistant in order for some routines to work
+        dt1 = mean(diff(t)); % time interval
         if not(min(diff(t))>0)
             t = [t(1):dt1:t(end)]';
         end
-        % calulating the time time interval of the data
-        dt = round(dt1*24*3600);
+        dt = round(dt1*24*3600); % time interval in seconds
         
         %%
         %       estimating the "instantanious LI thickness"
@@ -172,7 +175,6 @@ for mooring_location = 1:4
             %       Considering only weeks with number of ridges abouve certain value and if draft
             %       measurement subset is not empty (e.g., if there is a certain minimum value for
             %       draft defined above and it was all below that certain value)
-            % if not(isempty(H_R_reshape{n})) &&  not(isempty(h_SubSet))
             if numel(H_R_reshape{n})>5 &&  not(isempty(h_SubSet))
                 
                 to_keep(n) = 1;
@@ -242,39 +244,30 @@ for mooring_location = 1:4
             LOCSall = [LOCSall; LOCS(to_keep,:)];
         end
         
-      
-        
-        % ----------------------------------------------------------------------------------------
-        % ----------------------------------------------------------------------------------------
-        % ----------------------------------------------------------------------------------------
-        % -------------                                                              -------------
-        % -------------               PLOTTING THE RESULTS                           -------------
-        % -------------                                                              -------------
-        % ----------------------------------------------------------------------------------------
-        % ----------------------------------------------------------------------------------------
-        % ----------------------------------------------------------------------------------------
+
+        %% -------------               PLOTTING THE RESULTS                           -------------
         
         if plotresults == 1
             %%      h, LI estimate, all ridges, ridge means
             
             myfig(1,1)
             if office_screens==1
-                set(gcf,'Position',[2586        1827        1022         199])
+                set(gcf,'Position',[2586        1110        1022         199])
             else
                 set(gcf,'Position',[10 400 700 200])
             end
             axis([-inf inf 0 30])
             yticks([0:0.5:2 3:5 10:5:30])
             FIG1 = gca;
-            reduce_plot(t,h);
+            reduce_plot(t,h);                                               % raw ULS draft signal
             
             if estimate_hourly==1
-                stairs(t_LI,h_LI2,'r','LineWidth',2)
+                stairs(t_LI,h_LI2,'r','LineWidth',2)                        % horly LI estimates
             end
             
-            scatter(T_R,H_R,'rv','SizeData',10)
-            stairs(T_R_pd(to_keep)-3.5,HR_100(to_keep),'k','LineWidth',2)
-            stairs(T_R_pd(to_keep)-3.5,DM(to_keep),'k','LineWidth',2)
+            scatter(T_R,H_R,'rv','SizeData',10)                             % individual ridge peaks
+            stairs(T_R_pd(to_keep)-3.5,HR_100(to_keep),'k','LineWidth',2)   % estimated expected deepest ridges
+            stairs(T_R_pd(to_keep)-3.5,DM(to_keep),'k','LineWidth',2)       % calculated level ice thickness (according to the deepest mode)
             
             dynamicDateTicks
             
@@ -404,6 +397,8 @@ for mooring_location = 1:4
             
             drawnow
         end
+
+        % printing estimated remaining time to finalize the loop
         TocTime = toc;
         fprintf('Time     : %.0f min %.0f s \n',floor(TocTime/60),TocTime-floor(TocTime/60)*60)
         TimeLeft = TocTime/i*(SetsNum-i);
@@ -412,9 +407,12 @@ for mooring_location = 1:4
 end
 
 %%
-save('results015.mat','LI_DM','LI_AM','D','N','M','WS',...
-            'WE','ThisYear','T','D_all','T_all','Dmax','Year',...
-            'Location','PKSall','LOCSall','YR','LC','ID')
+
+if save_results==1
+    save('RESULTS.mat','LI_DM','LI_AM','D','N','M','WS',...
+        'WE','ThisYear','T','D_all','T_all','Dmax','Year',...
+        'Location','PKSall','LOCSall','YR','LC','ID')
+end
 
 
 
