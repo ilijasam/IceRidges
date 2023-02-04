@@ -1,10 +1,9 @@
-% for the previous version of this script see "DRAFT_Q_Median_Ice.m"
-
-% This script is mooring/year datasets, determines the level ice draft by analysing the draft
+% This script is goes throug draft datasets, determines the level ice draft by analysing the draft
 % distrivbution and extracts ridge paramenters (deepest, mean, number of ridges).
-addpath('Supporting Files\')
 
-% Defining the folder that contains the data in .mat format
+addpath('Supporting Files\') % loading supporing scripts&variables
+
+% Defining the folder that contains the draft data in .mat format
 MatFilesFolder = 'c:\Users\ilijas\OneDrive - NTNU\PhD\IceRidges\MAT files';
 
 plotresults = 1;
@@ -14,6 +13,7 @@ estimate_hourly = 0;
 level_ice_time = 3;                 %   duration of sample for LI estimate (in hours)
 level_ice_statistics_days = 7;   	%   duration of sample of estimated LI for LI statistics (in days)
 
+% creating empty plotting variables
 CompletePlot3 = [];
 CompletePlot4 = [];
 CompletePlot5 = [];
@@ -21,7 +21,7 @@ CompletePlot6 = [];
 CompletePlot7 = [];
 CompletePlot8 = [];
 
-%       make empty vectors if it is the first year to be evaluated
+%       make empty vectors if it is the first year to be evaluated 
 if not(exist('LI'))
     LI_DM = [];         %   level ice estimate
     LI_AM = [];         %   level ice estimate DEEPEST MODE
@@ -43,7 +43,7 @@ end
 % defining strings abcd for corresponding 1234 locations
 Location_vector = ['a';'b';'c';'d'];
 
-% % defining which years to be analysed for 4 different locations
+% defining which years to be analysed for 4 different locations A, B, C, D
 % loc_yrs{1} = [03:08 10:15 16 17];
 % loc_yrs{2} = [03 04 06 08 10 12 13 15 16 17];
 % loc_yrs{3} = [03 04 05 07];
@@ -52,38 +52,40 @@ Location_vector = ['a';'b';'c';'d'];
 loc_yrs{1} = [];
 loc_yrs{2} = [];
 loc_yrs{3} = [];
-loc_yrs{4} = [17];
+loc_yrs{4} = [16 17];
 
-PKS = zeros(5000,100);
-LOCS = zeros(5000,100);
+% PKS = zeros(5000,100);
+% LOCS = zeros(5000,100);
 
 SetsNum = numel(loc_yrs{1})+numel(loc_yrs{2})+numel(loc_yrs{3})+numel(loc_yrs{4});
 
 i = 0;
 tic
+%%
 for mooring_location = 1:4
-% for mooring_location = 1
     
     % reading the corresponding string abcd for location number 1234
     loc_mooring = Location_vector(mooring_location,1);
-    
-    
+        
     for yr = loc_yrs{mooring_location}
-%     for yr = 14:15
-        fprintf('ML: %.0f   YR: %.0f \n',mooring_location,yr);
+
+        % printing the current mooring location and season, writing the year
+        fprintf('Mooring Location: %.0f   Season start: %.0f \n',mooring_location,yr);
         i = i+1;
         ID(i,1) = i;
         YR(i,1) = 2000+yr;
         LC(i,1) = mooring_location;
         
+        % deleting all the variables except those listed under
         keep yr office_screens estimate_hourly level_ice_time level_ice_statistics_days...
             CompletePlot3 CompletePlot4  CompletePlot5 CompletePlot6 CompletePlot7 CompletePlot8...
             LI_AM LI_DM D N M T D_all T_all Dmax Year Location loc_mooring...
             ID i YR LC WS WE mooring_location Location_vector loc_yrs plotresults PKS LOCS PKSall LOCSall SetsNum MatFilesFolder
         
+        % loading draft database
         load([MatFilesFolder,'\uls', sprintf('%02d',yr) ,loc_mooring,'_draft.mat'])
         
-        %%
+        %% Reading draft data to variables        
         
         h = Data.draft;
         t = Data.dateNUM;
@@ -112,18 +114,20 @@ for mooring_location = 1:4
             t_LI = mean(t_reshape,1); % time for LI predictions that are about to be estimated
             clear h_LI2
             for n = 1:length(t_LI)
-                [f,xi]=ksdensity(h_reshape(:,n)) ;
-                [fmax imax] = max(f);
-                h_LI2(n) = xi(imax);
+                [f,xi]=ksdensity(h_reshape(:,n)); % making a karnel PDF from the data
+                [fmax imax] = max(f); % finding maximum of the PDF (finding mode)
+                h_LI2(n) = xi(imax); % storing the mode
             end
         end
         
-        clear adcp no_e i_max fmax f xi dt1 n imax mean_time mean_points Data
+        clear adcp no_e i_max fmax f xi dt1 n imax mean_time mean_points Data % cleaning some variables
         %%      RAYLEIGH CRITERIA
-                
+        
+        % defining rayleigh criteria parameters
         h_tres = 2.5;
         h_k_min = 5;
         
+        % RC data folder is used to save the identified ridges and their time of occurence
         if isfile(['RC data\', sprintf('%02d',yr) ,loc_mooring,'.mat'])
             load(['RC data\', sprintf('%02d',yr) ,loc_mooring,'.mat'])
         else
@@ -135,7 +139,7 @@ for mooring_location = 1:4
         %%      RIDGE STATISTICS
         
         %       Transferring the time vector into a matrix t_reshape_R with N colums (weeks).
-        %       This is necessary in order to evaluate weekly statistics.
+        %       This is necessary in order to evaluate weekly statistics in a faster way. 
         mean_time_R = 3600*24*level_ice_statistics_days;
         mean_points_R = mean_time_R/dt;
         %       no_e_R is the number of elements to take in, so it is dividable with number of
@@ -207,9 +211,7 @@ for mooring_location = 1:4
             end
             
         end
-        
-%         PKS(length(DM)+1:end,:) = [];
-%         LOCS(length(DM)+1:end,:) = [];
+
         
         
         %%      ESTIMATING THE EXPECTED DEEPEST RIDGE
@@ -227,13 +229,13 @@ for mooring_location = 1:4
             D = [D HR_100(to_keep)];                                                                % expected deepest ridge
             N = [N R_no(to_keep)];                                                                  % number of ridges
             M = [M 5+pd_mean(to_keep)];                                                             % mean keel depth (exp dist parameter)
-            WS = [WS Ws(to_keep)];                                                                           % week start timing
-            WE = [WE We(to_keep)];                                                                           % week end timing
+            WS = [WS Ws(to_keep)];                                                                  % week start timing
+            WE = [WE We(to_keep)];                                                                  % week end timing
             ThisYear = [zeros(1,length(LI_DM)-length(DM(to_keep))) ones(1,length(DM(to_keep)))];    % indicating which elemens are from current year/location
             T = [T T_R_pd(to_keep)];                                                                % mean time of weekly keels
             D_all{i} = H_R_reshape(to_keep);                                                        % all individual keel depths
             T_all{i} = T_R_reshape(to_keep);                                                        % all individual keel times
-            Dmax = [Dmax dmax(to_keep)];                                                         % weekly deepest ridge
+            Dmax = [Dmax dmax(to_keep)];                                                            % weekly deepest ridge
             Year = [Year; (2000+yr)*ones(length(DM(to_keep)),1)];                                   % year of weekly estimates
             Location = [Location; mooring_location*ones(length(DM(to_keep)),1)];                    % location of weekly estimates
             PKSall = [PKSall; PKS(to_keep,:)];
@@ -277,7 +279,7 @@ for mooring_location = 1:4
             dynamicDateTicks
             
             %%      Weekly number of ridges
-            myfig(2,1)
+            myfig(2,1);
             FIG2 = gca;
             if office_screens==1
                 set(gcf,'Position',[2586        1535        1022         199])
@@ -293,7 +295,7 @@ for mooring_location = 1:4
             linkaxes([FIG1,FIG2],'x')
             
             %%
-            myfig(33,1)
+            myfig(3,1);
             if office_screens==1
                 set(gcf,'Position',[2930.00         600.00        350.00        240.00])
             else
@@ -325,7 +327,7 @@ for mooring_location = 1:4
             CompletePlot4 = scatter(LI_DM,M,36,ThisYear,'filled','MarkerFaceAlpha',0.4);
             
             %%
-            myfig(5,1)
+            myfig(5,1);
             if office_screens==1
                 set(gcf,'Position',[2570.00        600.00        350.00        240.00])
             else
@@ -343,7 +345,7 @@ for mooring_location = 1:4
             drawnow
             
             %%
-            myfig(6,1)
+            myfig(6,1);
             if office_screens==1
                 set(gcf,'Position',[2930.00        250.00        350.00        240.00])
             else
@@ -361,7 +363,7 @@ for mooring_location = 1:4
             drawnow
             
             %%
-            myfig(7,1)
+            myfig(7,1);
             if office_screens==1
                 set(gcf,'Position',[3286.00        600.00        350.00        240.00])
             else
@@ -380,7 +382,7 @@ for mooring_location = 1:4
             drawnow
             
             %%
-            myfig(8,1)
+            myfig(8,1);
             if office_screens==1
                 set(gcf,'Position',[3286.00        250.00        350.00        240.00])
             else
