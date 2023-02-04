@@ -1,6 +1,8 @@
 % This script is goes throug draft datasets, determines the level ice draft by analysing the draft
 % distrivbution and extracts ridge paramenters (deepest, mean, number of ridges). 
-% In order to run this script, data needs to be stored in the folder defined in MatFilesFolder.
+
+% In order to run this script, data needs to be stored in the folder defined in MatFilesFolder. This data can be created
+% using S001_BeaufortGyreData_to_MatlabData.m
 
 addpath('Supporting Files\') % loading supporing scripts&variables
 
@@ -62,6 +64,10 @@ loc_yrs{4} = [17];
 % auxiliarry variable used to estimate script calculation time
 SetsNum = numel(loc_yrs{1})+numel(loc_yrs{2})+numel(loc_yrs{3})+numel(loc_yrs{4}); 
 
+
+PKS = zeros(5000,100);
+LOCS = zeros(5000,100);
+
 i = 0;
 tic
 %%
@@ -74,6 +80,7 @@ for mooring_location = 1:4
 
         % printing the current mooring location and season, writing the year
         fprintf('Mooring Location: %.0f   Season start: %.0f \n',mooring_location,yr);
+
         i = i+1;
         ID(i,1) = i;
         YR(i,1) = 2000+yr;
@@ -83,7 +90,8 @@ for mooring_location = 1:4
         keep yr office_screens estimate_hourly level_ice_time level_ice_statistics_days...
             CompletePlot3 CompletePlot4  CompletePlot5 CompletePlot6 CompletePlot7 CompletePlot8...
             LI_AM LI_DM D N M T D_all T_all Dmax Year Location loc_mooring...
-            ID i YR LC WS WE mooring_location Location_vector loc_yrs plotresults PKS LOCS PKSall LOCSall SetsNum MatFilesFolder
+            ID i YR LC WS WE mooring_location Location_vector loc_yrs plotresults PKS LOCS PKSall LOCSall SetsNum...
+            MatFilesFolder save_results
         
         % loading draft database
         load([MatFilesFolder,'\uls', sprintf('%02d',yr) ,loc_mooring,'_draft.mat'])
