@@ -168,7 +168,7 @@ for mooring_location = 1:4
             %       Neglecting drafts below a certaing value if necessary (e.g., h>0.2)
             h_SubSet =  h(  (h<3) &(h>0.0) & (t>Ws(n)) & t<We(n) ) ;
             
-            
+             
             %       Considering only weeks with number of ridges abouve certain value and if draft
             %       measurement subset is not empty (e.g., if there is a certain minimum value for
             %       draft defined above and it was all below that certain value)
