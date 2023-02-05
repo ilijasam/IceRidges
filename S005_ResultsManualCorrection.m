@@ -16,18 +16,32 @@
 % Figure 4 shows the "distogram" plot where evolution of the level ice can be seen and outliers can
 % be identified more reliably
 
+% INSTRUCTIONS FOR GOING THROUGH THE LOOP
+% 
+%     - Arrow right     -   Go one week forward
+%     - Arrow left      -   Go one week back
+%     - Arrow up        -   Go 5 weeks forward
+%     - Arrow down      -   Go 5 weeks back
+%     - NumPad 0        -   Select the point to be analysed in Figure 4 (only horisontal location is enogh)
+%     - Enter           -   Correct the location of level ice thickness in Figure 3
+%     - NumPad -        -   Delete current point
+%     - Esc             -   Go forward to next season/location
+
+% In order to close the loop completely do the following
+%       First press "NumPad +" and then press "Esc"
+
 clear all
 close all
 clc
 
-MatFilesFolder = 'c:\Users\ilijas\OneDrive - NTNU\PhD\IceRidges\MAT files';
-
 addpath('Supporting Files\')
-load('results1')
-load('ManualCorrection_3.mat')
+MatFilesFolder = 'c:\Users\ilijas\OneDrive - NTNU\PhD\IceRidges\MAT files';
 load('co.mat')
 office_screens = 1;
 Location_vector = ['a';'b';'c';'d'];
+
+load('Results\results1')                    % !!! LOAD RESULTS FROM S003
+% load('Results\ManualCorrection_3.mat')    % !!! LOAD PREVIOUS MANUAL CORRECTION RESULTS (IF AVAILABLE)
 
 % deleting data points that have less ridges than difined in Ntreashold
 Ntreashold = 15;
@@ -46,6 +60,10 @@ PKSall(N<Ntreashold,:) = [];
 LOCSall(N<Ntreashold,:) = [];
 N(N<Ntreashold) = [];
 
+% Defining which years to be analysed for 4 different locations A, B, C, D
+% Define the same location/seasons as in S003 if all data is to be manually revised/corrected
+
+% These are the location/seasons used in Samardžija & Høyland (2023)
 loc_yrs{1} = [03:08 10:15 16 17];
 loc_yrs{2} = [03 04 06 08 10 12 13 15 16 17];
 loc_yrs{3} = [03 04 05 07];
@@ -55,11 +73,8 @@ loc_yrs{4} = [06 07 08 10 12 13 14 16 17];
 for Cloca = 1:4
     for Cyear = 2000+loc_yrs{Cloca}
         
-        % Cyear = 2004;
-        % Cloca = 2;
         id = ID(YR == Cyear & LC == Cloca);
-        ThisYear = Year == Cyear & Location == Cloca;       
-        
+        ThisYear = Year == Cyear & Location == Cloca;   
         
         %% LOADING THE DRAFT DATA
         load([MatFilesFolder,'\uls', sprintf('%02d',Cyear-2000) ,Location_vector(Cloca),'_draft.mat'])
@@ -73,7 +88,7 @@ for Cloca = 1:4
         
         %% DISTOGRAM PLOT
         
-        myfig(4,1); hold on; grid on; box on; f4 = gcf; f4.Position = [2984        1083         647         309];
+        myfig(4,1); hold on; grid on; box on; f4 = gcf; f4.Position = [3000        1020         647         309];
         
         level_ice_time = 1;             %   duration of sample for instantaneous LI estimate (in hours)
         level_ice_statistics_days = 7;  %   duration of sample of estimated LI for LI statistics (in days)
@@ -134,7 +149,7 @@ for Cloca = 1:4
         %% --------------------------------------------------------------------------
         myfig(1,1);
         if office_screens==1
-            set(gcf,'Position',[3800        1100        1062         165])
+            set(gcf,'Position',[3800        1180        1062         165])
         else
             set(gcf,'Position',[10 1150 700 200])
         end
@@ -152,7 +167,7 @@ for Cloca = 1:4
         
         myfig(2,1);
         if office_screens==1
-            set(gcf,'Position',[3000        100        2000         850])
+            set(gcf,'Position',[3000        100        2000         800])
         else
             set(gcf,'Position',[10 1150 700 200])
         end
@@ -172,7 +187,7 @@ for Cloca = 1:4
         %% --------------------------------------------------------------------------
         
         myfig(3,1);
-        set(gcf,'Position',[2571         258         402        1135])
+        set(gcf,'Position',[2571         100         402        1135])
         
         subplot(4,1,1); hold on; grid on;
         caxis([0 1])
@@ -226,7 +241,8 @@ for Cloca = 1:4
         br = 0;
         figure(4);
         title([sprintf(['Location: '  upper(Location_vector(Cloca)) '       Season: %d / %d'],Cyear,Cyear+1)])
-        while not(br == 27)
+        BreakSwitch = 0;
+        while not(br == 27)  % br = 27 is when user presses Esc
             n = nn(i);
             AX2.XLim = [WS(n) WE(n)];
             CP1.XData = LI_DM(n);
@@ -258,8 +274,6 @@ for Cloca = 1:4
             PS.XData = locs;
             PS.YData = pks;
             DM(n) = max(locs(   (locs<3) & (pks>0.25)    ));         % deepest mode estimate
-            %     DMline1.XData = [DM1(n) DM1(n)];
-            %     DM2line.YData = [DM1(n) DM1(n)];
             
             [pks,locs] = max(f);                                    % intensity and location of the absolute mode
             AM(n) = xi(locs);
@@ -269,6 +283,7 @@ for Cloca = 1:4
             
             w = waitforbuttonpress;
             br = double(get(gcf,'CurrentCharacter'));
+            
             if br == 29                         % arrow right
                 i = min(length(nn),i+1);
             elseif br == 28                     % arrow left
@@ -287,13 +302,23 @@ for Cloca = 1:4
                 figure(4)
             elseif br == 45                     % NumPad -
                 to_delete(n) = true;
+            elseif br == 43                     % NumPad +
+                BreakSwitch = 1;
             end
             
             
         end
-        
+        if BreakSwitch == 1
+            break
+        end
+    end
+    if BreakSwitch == 1
+        break
     end
 end
+
+% Save the manually corrected results. One can override the previously defined and loaded manual correction results or
+% make new data file.
 
 % save('ManualCorrection_3.mat','to_delete','LI_M')
 

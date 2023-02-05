@@ -2,17 +2,25 @@
 % It loops through the weeks of a selected season/location
 
 % Instructions for looping through the weeks
+%     - Select a season/year in Cyear and Cloca variables  
 %     - run the script
 %     - NumPad1 for going one week back
 %     - NumPad2 for going one week forward
 %     - Esc for stopping the loop
 
+
+clc
+clear all
+close all
+
+load('Results\results1.mat')
 load('Supporting Files\co.mat')
 MatFilesFolder = 'c:\Users\ilijas\OneDrive - NTNU\PhD\IceRidges\MAT files';
+office_screens = 1;
 
 % Define season and location that is to be analysed
-Cyear = 2017;
-Cloca = 4;
+Cyear = 2017;       % (e.g., 2017 for 2017/2018 season)
+Cloca = 4;          % (1 - location A; 2-B; 3-C; 4-D)
 Location_vector = ['a';'b';'c';'d'];
 id = ID(YR == Cyear & LC == Cloca);
 
@@ -31,7 +39,7 @@ end
 %% --------------------------------------------------------------------------
 myfig(1,1)
 if office_screens==1
-    set(gcf,'Position',[3000        100        1022         199])
+    set(gcf,'Position',[3000        1100        1022         199])
 else
     set(gcf,'Position',[10 1150 700 200])
 end
@@ -51,7 +59,7 @@ dynamicDateTicks
 
 myfig(2,1)
 if office_screens==1
-    set(gcf,'Position',[4200        100         646         549])
+    set(gcf,'Position',[3000        100         2000         890])
 else
     set(gcf,'Position',[10 1150 700 200])
 end
@@ -98,7 +106,7 @@ subplot(4,1,3); hold on; grid on;
 axis([0 3 0 30])
 xlabel('LI DM [m]')
 ylabel('Weekly deepest ridge [m]')
-scatter(LI_DM,Dmax,36,ThisYear*10,'filled','MarkerFaceAlpha',0.4,'MarkerFaceColor','k');
+scatter(LI_DM,Dmax,36,ThisYear*10,'filled','MarkerFaceAlpha',0.4);
 scatter(LI_DM(ThisYear),Dmax(ThisYear),10,ThisYear(ThisYear)*10,'filled','MarkerFaceAlpha',1);
 CP3 = scatter(0.2,7,'square','k','linewidth',1,'sizedata',80);
 T3 = title('t');
@@ -108,7 +116,7 @@ subplot(4,1,4); hold on; grid on;
 axis([0 3 0 1200])
 xlabel('LI DM [m]')
 ylabel('Number of ridges [-]')
-scatter(LI_DM,N,36,ThisYear*10,'filled','MarkerFaceAlpha',0.4,'MarkerFaceColor','k');
+scatter(LI_DM,N,36,ThisYear*10,'filled','MarkerFaceAlpha',0.4);
 scatter(LI_DM(ThisYear),N(ThisYear),10,ThisYear(ThisYear)*10,'filled','MarkerFaceAlpha',1);
 CP4 = scatter(0.2,7,'square','k','linewidth',1,'sizedata',80);
 T4 = title('t');
