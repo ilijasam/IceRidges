@@ -224,7 +224,6 @@ for mooring_location = 1:4
         
         
         %%      ESTIMATING THE EXPECTED DEEPEST RIDGE
-        % Estimated deepest ridge is 
         
         for n = 1:size(Mcdf,1)
             if (sum(Mcdf(n,:))>0) && not(isempty(H_R_reshape{n}))

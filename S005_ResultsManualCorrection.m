@@ -1,5 +1,3 @@
-% ---- WORK IN PROGRESS  --- %
-
 % This script is used to analyse the level ice draft identification point by point. First, year and
 % location is specified of the mooring subset to be analysed. Analysis is done by observing several figures.
 
@@ -30,12 +28,14 @@
 % In order to close the loop completely do the following
 %       First press "NumPad +" and then press "Esc"
 
+% This script requires ULS data in .mat format. The data is stored in folder defined in MatFilesFolder variable
+
 clear all
 close all
 clc
 
 addpath('Supporting Files\')
-MatFilesFolder = 'c:\Users\ilijas\OneDrive - NTNU\PhD\IceRidges\MAT files';
+MatFilesFolder = 'c:\Users\ilijas\OneDrive - NTNU\PhD\IceRidges\MAT files';  % define folder with .mat files with ULS draft data
 load('co.mat')
 office_screens = 1;
 Location_vector = ['a';'b';'c';'d'];
@@ -278,12 +278,13 @@ for Cloca = 1:4
             [pks,locs] = max(f);                                    % intensity and location of the absolute mode
             AM(n) = xi(locs);
             
+            % Create lines indicating location of AM and DM in Figure3/Subplot2
             AMline.XData = [AM(n) AM(n)];
             DMline.XData = [DM(n) DM(n)];
             
+            % looping control
             w = waitforbuttonpress;
-            br = double(get(gcf,'CurrentCharacter'));
-            
+            br = double(get(gcf,'CurrentCharacter'));            
             if br == 29                         % arrow right
                 i = min(length(nn),i+1);
             elseif br == 28                     % arrow left
