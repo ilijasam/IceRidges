@@ -8,21 +8,8 @@ myfig(11,1)
 set(gcf,'Units','normalized')
 set(gcf,'Position',[0         0         0.5        1])
 
-load('Results\results1.mat')
-load('Results\ManualCorrection_3.mat')
 addpath('Supporting Files\')
-
-Ntreashold = 15;
-LI_DM(N<Ntreashold) = [];
-Dmax(N<Ntreashold) = [];
-M(N<Ntreashold) = [];
-N(N<Ntreashold) = [];
-
-LI_DM = LI_DM(not(to_delete));
-LI_M = LI_M(not(to_delete));
-Dmax = Dmax(not(to_delete));
-M = M(not(to_delete));
-N = N(not(to_delete));
+load("Results\FinalResults.mat")
 
 %%
 subplot(6,3,1); cla; hold on; grid on; box on

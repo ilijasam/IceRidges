@@ -1,26 +1,17 @@
 % --- WORK IN PROGRESS ---
 
 %%
-% This script is calculating the "running level ice (LI) statistics".
-
-% First, it estimates the level ice from the signal by calulating the mode. This is done by taking samples with duration of "level_ice_time".
-% Then, with this estimated LI, we do the statistics every "level_ice_statistics_time" days.
-% Final plot shows the histograms throughout the year. It is in a way the yearly level ice statistics.
-
-
-% UPDATE S005_FIG_03.m
+% This script is similar to S007a, but with different figures.
+% See S007a for further description.
 
 clear all
 close all
 
 MatFilesFolder = 'c:\Users\ilijas\OneDrive - NTNU\PhD\IceRidges\MAT files';
 
-
 yr = 12;
 office_screens = 1;
 mooring_location = 'b';
-
-
 
 addpath('Supporting Files\')
 
@@ -178,7 +169,6 @@ figure(16)
 
 [m,i] = min(abs(t_LI_TEMP-x));
 
-
 if exist('PCdm')
     delete(PCdm);
     delete(PCam);
@@ -197,12 +187,6 @@ if exist('Hdm')
     delete(Hdm);
     delete(Ham);
 end
-% t1 = text(1.2,2.8,'AM','FontWeight','bold');
-% t2 = text(2.5,0.5,'DM','FontWeight','bold','BackgroundColor','w');
-
-% Hdm = plot([h_LI_DM(i) h_LI_DM(i)],get(gca,'ylim'),'r','LineWidth',1);
-% Ham = plot([h_LI_AM(i) h_LI_AM(i)],get(gca,'ylim'),'r','LineWidth',1);
-
 
 bw_sigma = std(h_SubSet);
 bw_n = numel(h_SubSet);
@@ -225,7 +209,6 @@ end
 hdm = plot(sp1,get(sp1,'xlim'),[h_LI_DM(i) h_LI_DM(i)],'r--','LineWidth',2);
 ham = plot(sp1,get(sp1,'xlim'),[h_LI_AM(i) h_LI_AM(i)],'r','LineWidth',2);
 L = legend(sp1,[ID hdm ham],'Ice draft','DM','AM','Ice drift speed','Location','northwest');
-
 
 sp1.XLim = [ws(i) we(i)];
 

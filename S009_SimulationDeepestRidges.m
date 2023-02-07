@@ -12,8 +12,6 @@ produce_scatter_plot = 1;
 produce_confidence_plot = 0;
 produce_return_period_plot = 0;
 
-
-
 %% loading and trimming the data 
 load('results1.mat')
 load('ManualCorrection_3.mat')

@@ -1,15 +1,5 @@
 % --- WORK IN PROGRESS ---
 
-clear all
-close all
-
-MatFilesFolder = 'c:\Users\ilijas\OneDrive - NTNU\PhD\IceRidges\MAT files';
-
-yr = 12;                        % Chose season to be analysed (e.g., 12 for 2012/2013)
-office_screens = 1;             % If 1, this works with double screen. Please update figure positions to your display layout.
-PlotMidResults = 0;             % Plot temporary results in Figure 22?        
-mooring_location = 'b';         % Chose mooring location
-
 %%
 % This script is calculating the "running level ice (LI) statistics".
 
@@ -17,18 +7,17 @@ mooring_location = 'b';         % Chose mooring location
 % Then, with this estimated LI, we do the statistics every "level_ice_statistics_time" days.
 % Final plot shows the histograms throughout the year. It is in a way the yearly level ice statistics.
 
-% UPDATE --------------  F4.mat
 
-% The script is modification of the original script "JP_year_long_histogram.m"
-% Here we look only at one year and optimize the figures for usage in JP1
+% UPDATE S005_FIG_03.m
 
-% - Weekly highest mode LI estimate is included
-% - The script is optimized for 2012D data set, but it can be used for other seasons/locations
+clear all
+close all
 
-% UPDATE -------------- AN_LI_InterAnnual
+MatFilesFolder = 'c:\Users\ilijas\OneDrive - NTNU\PhD\IceRidges\MAT files';
 
-% This update was made in order to make a plot of interannual LI developement that is to be used
-% with "AN_WeeklyHistograms.m" to analyse data points one by one
+yr = 12;
+office_screens = 1;
+mooring_location = 'b';
 
 addpath('Supporting Files\')
 
@@ -68,50 +57,10 @@ h_LI_mode = mode(round(h_reshape*1000),1)/1000;
 t_LI = mean(t_reshape,1);
 h_mean = mean(h_reshape);
 
-%       calculate the mode from numerical pdf (this is seems to be the most precise way)
-% for n = 1:length(t_LI)
-%     [f,xi]=ksdensity(h_reshape(:,n)) ;
-%     [fmax imax] = max(f);
-%
-% %     h_LI_pdf_mode(n) = xi(imax);
-%     h_LI_mode(n) = xi(imax);
-% end
-
-
-clear dt1 dt no_e t_reshape mean_time mean_points
-
-
-
 %%      ESTIMATING THE LEVEL ICE STATISTICS FOR EACH "level_ice_statistics_time" PERIOD
-
-myfig(22,1)
-FIG22 = figure(22);
-if office_screens==1
-    set(gcf,'Position', [2570.00        600.00        560.00        300.00]);
-else
-    set(gcf,'Position',[100 100 435 245])
-end
-%       subolot of level draft signal and level ice estimate as a reference to know where you are at each step
-%       Tline(s) are showing the middle of current estimate and the range of the current bin
-subplot(2,1,1)
-hold on
-grid on
-axis([-inf inf 0 30])
-plot(t(1:20:end),h(1:20:end))
-plot(t_LI,h_LI_mode,'k','LineWidth',1)
-dynamicDateTicks()
-
-
-%       initializing subplot for the histograms for each "level_ice_statistics_days"
-subplot(2,1,2)
-hold on
-grid on
-axis([0 6 0 4])
-MLine = plot([0 0],[0 12],'r');             % initializing the line that indicates the location of the mode
 
 %       defining the histogram bins and initialization of moving histogram
 HistBins = [-0.1:0.1:8];
-HH = histogram(h_LI_mode,HistBins,'Normalization','pdf','EdgeColor','k');
 
 %       setting the period (already defined in the beginning)
 period = (24/level_ice_time)*level_ice_statistics_days;
@@ -128,10 +77,10 @@ t_hist = zeros(length(1:period:length(h_LI_mode)-period),1);
 for n = 1:period:length(h_LI_mode)-period
     i = i+1;
     HHi(i,:) = histcounts(h_LI_mode(n:n+period),HistBins);
-    HH.BinCounts = HHi(i,:);
+%     HH.BinCounts = HHi(i,:);
     t_hist(i,1) = mean(t_LI(n:n+period));
     
-    h_SubSet =  h(  (h<3.0) &(h>0.2) & (t>t_LI(n)) & (t<t_LI(n+period))) ;
+    h_SubSet =  h(  (h<3.0) &(h>0.0) & (t>t_LI(n)) & (t<t_LI(n+period))) ;
     
     if numel(h_SubSet)>100
         bw_sigma = std(h_SubSet);
@@ -144,10 +93,8 @@ for n = 1:period:length(h_LI_mode)-period
             h_LI_DM = [h_LI_DM; max(locs(   (locs<3) & (pks>0.3)    ))];
             
             [pks1,locs1] = max(f);                                    % intensity and location of the absolute mode
-            h_LI_AM = [h_LI_AM; xi(locs1)];
+            h_LI_AM = [h_LI_AM; xi(locs1)];            
             
-            
-            MLine.XData = [ones(2,1)*h_LI_DM(end)];
             t_LI_TEMP = [t_LI_TEMP; mean(t_LI(n:n+period))];
             
             
@@ -156,10 +103,9 @@ for n = 1:period:length(h_LI_mode)-period
         end
         
     end
-        
-    if PlotMidResults == 1
-    drawnow
-    end
+    
+    
+    
 end
 hh = HistBins(1:end-1)+diff(HistBins)/2;
 
@@ -193,35 +139,41 @@ dynamicDateTicks()
 
 xlim([min(X(:)) max(X(:))])
 
-
-
 P3 = plot3(t_LI_TEMP,  h_LI_DM,50*ones(1,length(h_LI_DM)),'color',[0.2 0.2 0.2],'Marker','square','MarkerSize',6,'LineStyle','none');
 P3 = plot3(t_LI_TEMP,  h_LI_AM,50*ones(1,length(h_LI_DM)),'color',[0.2 0.2 0.2],'Marker','x','MarkerSize',4,'LineStyle','none');
 
-myfig(17,1); f7 = gcf ; ax7 = gca;
-if office_screens == 1
-    f7.Position = [3250        1000         400         350];
-else
-    f7.Position = [1150,90,400,350];
-end
-
-
 myfig(18,1); f8 = gcf; ylim([0 5])
 if office_screens == 1
-    f8.Position = [2571        100        2400        400];
+    f8.Position = [2571        100        1000        400];
 else
     f8.Position = [51,554.3333,1600,306];
 end
-reduce_plot(t,h)
+sp1 = subplot(2,6,1:4); hold on; grid on; box on
+% sp1.Position = [0.1300    0.195    0.42    0.78]
+ylim([0 5])
+ID = reduce_plot(t,h,'k');
+xlabel('Time [days]')
+ylabel('Ice draft [m]')
+r = patch([t(1) t(1)+1  t(1)+1 t(1)],[0 0 5 5],'r');
+r.EdgeColor = 'none'
+r.FaceAlpha = 0.3;
+
 dynamicDateTicks
-ax8 = gca;
+
+sp3 = subplot(2,4,5:8); hold on; grid on; box on;
+ylim([0 5])
+reduce_plot(t,h,'k')
+xlabel('Time [hours]')
+ylabel('Ice draft [m]')
+dynamicDateTicks
+
+
 
 %%
 figure(16)
 [x,y] = ginput(1);
 
 [m,i] = min(abs(t_LI_TEMP-x));
-
 
 if exist('PCdm')
     delete(PCdm);
@@ -230,42 +182,56 @@ end
 PCdm = plot3(t_LI_TEMP(i),  h_LI_DM(i),50,'square','MarkerEdgeColor','r','MarkerSize',10,'linewidth',1);
 PCam = plot3(t_LI_TEMP(i),  h_LI_AM(i),50,'square','MarkerEdgeColor','r','MarkerSize',10,'linewidth',1);
 
-figure(17)
-clf; hold on; grid on; box on;
+figure(18)
+sp2 = subplot(2,6,5:6);
+cla; hold on; grid on; box on;
+axis(sp2,[0 3 0 4])
 h_SubSet =  h(  (h<3.0) &(h>0.0) & (t>ws(i)) & (t<we(i))) ;
-histogram(h_SubSet,0:0.1:3,'Normalization','pdf')
+histogram(h_SubSet,0:0.1:3,'Normalization','pdf','facecolor','k')
+sp2.YLim = [0 4];
 if exist('Hdm')
     delete(Hdm);
     delete(Ham);
 end
-Hdm = plot([h_LI_DM(i) h_LI_DM(i)],get(gca,'ylim'),'k--','LineWidth',2);
-Ham = plot([h_LI_AM(i) h_LI_AM(i)],get(gca,'ylim'),'k-','LineWidth',2);
-
-
-
 
 bw_sigma = std(h_SubSet);
 bw_n = numel(h_SubSet);
 bw_h = 1*1.06*bw_sigma*bw_n^-0.2;
-[f,xi]=ksdensity(h_SubSet(h_SubSet<5),'Bandwidth',bw_h,'NumPoints',100 ) ;
+[f,xi]=ksdensity(h_SubSet(h_SubSet<5),'Bandwidth',bw_h,'NumPoints',200 ) ;
 [pks,locs] = findpeaks(f,xi);
-PDFk = plot(xi,f,'r','LineWidth',2);
+plot(xi,f,'r','LineWidth',2)
 
-legend([PDFk,Ham,Hdm],'PDF','AM','DM')
+xlabel('Ice draft [m]')
+ylabel('Probability density [m^{-1}]')
+legend('Hist.','PDF')
 
 figure(18)
-ax8.XLim = [ws(i) we(i)];
-dynamicDateTicks
+sp1.XLim = [ws(i) we(i)];
+dynamicDateTicks(sp1)
 if exist('hdm')
     delete(hdm);
     delete(ham);
 end
-hdm = plot(get(gca,'xlim'),[h_LI_DM(i) h_LI_DM(i)],'k--','LineWidth',2);
-ham = plot(get(gca,'xlim'),[h_LI_AM(i) h_LI_AM(i)],'k-','LineWidth',2);
+hdm = plot(sp1,get(sp1,'xlim'),[h_LI_DM(i) h_LI_DM(i)],'r--','LineWidth',2);
+ham = plot(sp1,get(sp1,'xlim'),[h_LI_AM(i) h_LI_AM(i)],'r','LineWidth',2);
+L = legend(sp1,[ID hdm ham],'Ice draft','DM','AM','Ice drift speed','Location','northwest');
 
-legend([ham,hdm],'AM','DM')
 
-ax8.XLim = [ws(i) we(i)];
+sp1.XLim = [ws(i) we(i)];
+
+%%
+DayNumber = 5;
+sp3.XLim = [round(ws(i)+DayNumber) round(ws(i)+DayNumber+1)];
+if exist('hdmD')
+    delete(hdmD);
+    delete(hamD);
+end
+hdmD = plot(sp3,get(sp1,'xlim'),[h_LI_DM(i) h_LI_DM(i)],'r--','LineWidth',2);
+hamD = plot(sp3,get(sp1,'xlim'),[h_LI_AM(i) h_LI_AM(i)],'r','LineWidth',2);
+r.XData = [round(ws(i)+DayNumber) round(ws(i)+DayNumber+1) round(ws(i)+DayNumber+1) round(ws(i)+DayNumber)];
+
+zoom(sp1,'out')
+zoom(sp3,'out')
 
 
 

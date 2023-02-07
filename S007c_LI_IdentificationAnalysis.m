@@ -1,4 +1,4 @@
-% --- WORK IN PROGRESS ---
+% This script makes a plot of level ice evloution for multiple seasons.
 
 office_screens = 0;
 myfig(9,1); grid on; box on;
@@ -21,7 +21,7 @@ loc_yrs{3} = [03 04 05 07];
 loc_yrs{4} = [06 07 08 10 12 13 14 16 17];
 
 SP = 0;
-for mooring_location = 4
+for mooring_location = 2
     loc_mooring = Location_vector(mooring_location,1);
     for yr = loc_yrs{mooring_location}
         SP = SP+1;
@@ -72,7 +72,7 @@ for mooring_location = 4
             %     HH.BinCounts = HHi(i,:);
             t_hist(i,1) = mean(t_LI(n:n+period));
 
-            h_SubSet =  h(  (h<3.0) &(h>0.2) & (t>t_LI(n)) & (t<t_LI(n+period))) ;
+            h_SubSet =  h(  (h<3.0) &(h>0.0) & (t>t_LI(n)) & (t<t_LI(n+period))) ;
 
             if numel(h_SubSet)>100
                 bw_sigma = std(h_SubSet);
