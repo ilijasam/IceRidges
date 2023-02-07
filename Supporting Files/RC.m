@@ -1,5 +1,7 @@
 %% Finding ridge keels with Rayleigh criteria
 
+% Author: Ilija Samardzija, email: ilijasamardzija91@gmail.com
+
 function [X,H] = RC(x,h,h_tres,h_k_min)
 
 X = x;

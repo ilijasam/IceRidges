@@ -8,16 +8,16 @@
 % This script is for producing a figure of the JP1 where two seasons are illustrated. One season is
 % purely FYI and the second season has MYI.
 
-addpath('..\Supporting Files\')
-MatFilesFolder = 'c:\Users\ilijas\OneDrive - NTNU\PhD\IceRidges\MAT files';
-
 clear all
 close all
 clc
 
+addpath('..\Supporting Files\')
+MatFilesFolder = 'c:\Users\ilijas\OneDrive - NTNU\PhD\IceRidges\MAT files';
+
 myfig(16,1)
 for yr = 12:13
-    keep yr MatFilesFolder
+    keep MatFilesFolder yr 
 
     office_screens = 1;
     mooring_location = 'b';
