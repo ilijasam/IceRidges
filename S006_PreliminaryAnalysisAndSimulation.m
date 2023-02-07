@@ -212,20 +212,3 @@ axis([0 35 0 35])
 yticks([0 10 20 30])
 scatter(Dmax,Dmaxs,'filled','MarkerFaceAlpha',0.4);
 plot([0 35],[0 35])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
